@@ -16,7 +16,7 @@
 		3FEA86E81F0CF1AB00DA7829 /* ThumbnailGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEA86E61F0CF1AB00DA7829 /* ThumbnailGridCell.swift */; };
 		3FEA86E91F0CF1AB00DA7829 /* ThumbnailGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FEA86E71F0CF1AB00DA7829 /* ThumbnailGridCell.xib */; };
 		3FEBE3051F01E84F00DE2722 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEBE3041F01E84F00DE2722 /* AppDelegate.swift */; };
-		3FEBE3071F01E84F00DE2722 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEBE3061F01E84F00DE2722 /* ViewController.swift */; };
+		3FEBE3071F01E84F00DE2722 /* PDFViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEBE3061F01E84F00DE2722 /* PDFViewController.swift */; };
 		3FEBE30A1F01E84F00DE2722 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3FEBE3081F01E84F00DE2722 /* Main.storyboard */; };
 		3FEBE30C1F01E84F00DE2722 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FEBE30B1F01E84F00DE2722 /* Assets.xcassets */; };
 		3FEBE30F1F01E84F00DE2722 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3FEBE30D1F01E84F00DE2722 /* LaunchScreen.storyboard */; };
@@ -25,6 +25,7 @@
 		3FF14BFB24AB2CCE001209ED /* sample.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 3FF14BFA24AB2CCE001209ED /* sample.pdf */; };
 		3FFD89EF1F02586C00966CCF /* OulineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FFD89ED1F02586C00966CCF /* OulineTableViewCell.swift */; };
 		3FFD89F01F02586C00966CCF /* OulineTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FFD89EE1F02586C00966CCF /* OulineTableViewCell.xib */; };
+		41C8701529F515EF00618B2C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C8701429F515EF00618B2C /* ViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,7 +39,7 @@
 		3FEA86E71F0CF1AB00DA7829 /* ThumbnailGridCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ThumbnailGridCell.xib; sourceTree = "<group>"; };
 		3FEBE3011F01E84F00DE2722 /* PDF-Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PDF-Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FEBE3041F01E84F00DE2722 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		3FEBE3061F01E84F00DE2722 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		3FEBE3061F01E84F00DE2722 /* PDFViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFViewController.swift; sourceTree = "<group>"; };
 		3FEBE3091F01E84F00DE2722 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3FEBE30B1F01E84F00DE2722 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3FEBE30E1F01E84F00DE2722 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -48,6 +49,7 @@
 		3FF14BFA24AB2CCE001209ED /* sample.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = sample.pdf; sourceTree = "<group>"; };
 		3FFD89ED1F02586C00966CCF /* OulineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OulineTableViewCell.swift; sourceTree = "<group>"; };
 		3FFD89EE1F02586C00966CCF /* OulineTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OulineTableViewCell.xib; sourceTree = "<group>"; };
+		41C8701429F515EF00618B2C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				3FEBE3041F01E84F00DE2722 /* AppDelegate.swift */,
-				3FEBE3061F01E84F00DE2722 /* ViewController.swift */,
+				3FEBE3061F01E84F00DE2722 /* PDFViewController.swift */,
 				3FEA86E41F0CF16F00DA7829 /* ThumbnailGridViewController.swift */,
 				3FD092351F0D249300D6C96F /* SearchTableViewController.swift */,
 				3FD092371F0D24BA00D6C96F /* SearchViewCell.swift */,
@@ -99,6 +101,7 @@
 				3FEBE30D1F01E84F00DE2722 /* LaunchScreen.storyboard */,
 				3FEBE3101F01E84F00DE2722 /* Info.plist */,
 				3FF14BFA24AB2CCE001209ED /* sample.pdf */,
+				41C8701429F515EF00618B2C /* ViewController.swift */,
 			);
 			path = "PDF-Demo";
 			sourceTree = "<group>";
@@ -181,9 +184,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41C8701529F515EF00618B2C /* ViewController.swift in Sources */,
 				3FEBE3201F0206C600DE2722 /* ToolView.swift in Sources */,
 				3F77F44C1F023BB4000732A9 /* OulineTableviewController.swift in Sources */,
-				3FEBE3071F01E84F00DE2722 /* ViewController.swift in Sources */,
+				3FEBE3071F01E84F00DE2722 /* PDFViewController.swift in Sources */,
 				3FD092391F0D24BA00D6C96F /* SearchViewCell.swift in Sources */,
 				3FEA86E51F0CF16F00DA7829 /* ThumbnailGridViewController.swift in Sources */,
 				3FEBE3051F01E84F00DE2722 /* AppDelegate.swift in Sources */,
