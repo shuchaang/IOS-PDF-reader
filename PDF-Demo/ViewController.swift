@@ -10,12 +10,20 @@ import UIKit
 import PDFKit
 
 class ViewController: UIViewController {
-    private var pdfdocument: PDFDocument?
     
+    var pdfPath:String?
+
+    private var rollBtn: UIButton!
+    private var pdfdocument: PDFDocument?
     private var pdfview: PDFView!
+    private var pdfScrollView: UIScrollView!
     private var pdfThumbView: PDFThumbnailView!
     private lazy var toolView = ToolView.instanceFromNib()
     private weak var observe : NSObjectProtocol?
+    var isRolling = false
+    var timer: Timer?
+    var scrollSpeed: CGFloat = 1.0 // 滚动速率，可根据需要调整
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,8 +36,21 @@ class ViewController: UIViewController {
         pdfview.document = pdfdocument
         pdfview.displayMode = .singlePageContinuous
         pdfview.autoScales = true
+        for view in pdfview.subviews {
+                if let scrollView = view as? UIScrollView {
+                           self.pdfScrollView = scrollView
+                           break
+                       }
+        }
         view.addSubview(pdfview)
         
+        rollBtn = UIButton(type: .system)
+        rollBtn.frame = CGRect(x:5, y:100, width:100, height:30)
+        rollBtn.setTitle("滚", for:.normal)
+        rollBtn.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+        rollBtn.addTarget(self, action: #selector(autoRollClick), for: .touchUpInside)
+        pdfview.addSubview(rollBtn)
+
         pdfThumbView = PDFThumbnailView()
         pdfThumbView.layoutMode = .horizontal
         pdfThumbView.pdfView = pdfview
@@ -42,6 +63,7 @@ class ViewController: UIViewController {
         toolView.thumbBtn.addTarget(self, action: #selector(thumbBtnClick), for: .touchUpInside)
         toolView.outlineBtn.addTarget(self, action: #selector(outlineBtnClick), for: .touchUpInside)
         toolView.searchBtn.addTarget(self, action: #selector(searchBtnClick), for: .touchUpInside)
+        toolView.editBtn.addTarget(self, action: #selector(setRollSpeedClick), for: .touchUpInside)
        
         pdfThumbView.translatesAutoresizingMaskIntoConstraints = false
         pdfThumbView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
@@ -110,6 +132,45 @@ class ViewController: UIViewController {
         let nav = UINavigationController(rootViewController: searchViewController)
         self.present(nav, animated: false, completion:nil)
     }
+    
+    @objc func setRollSpeedClick(sender: UIButton) {
+        // 创建一个提示框
+               let alertController = UIAlertController(title: "设置滚动速度", message: nil, preferredStyle: .alert)
+               // 添加一个文本框到提示框
+               alertController.addTextField { textField in
+                   textField.keyboardType = .numberPad // 设置键盘类型为数字键盘
+               }
+               // 添加一个取消按钮
+               alertController.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+               // 添加一个确定按钮
+               alertController.addAction(UIAlertAction(title: "确定", style: .default, handler: { [weak self] _ in
+                   // 获取用户输入的数字
+                   if let text = alertController.textFields?.first?.text, let number = Float(text) {
+                       self?.scrollSpeed=CGFloat(number)
+                   } else {
+                       print("输入无效的数字")
+                   }
+               }))
+               // 显示提示框
+               present(alertController, animated: true, completion: nil)
+    }
+
+    
+    @objc func autoRollClick(sender: UIButton) {
+        if(isRolling){
+            // 停止定时器
+            rollBtn.setTitle("滚",for:.normal)
+            timer?.invalidate()
+            timer = nil
+            isRolling=false
+            
+        }else{
+            // 启动定时器，实现自动滚动
+            rollBtn.setTitle("停",for:.normal)
+            timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
+            isRolling=true
+        }
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -138,4 +199,20 @@ extension ViewController: SearchTableViewControllerDelegate {
         pdfview.currentSelection = selection
         pdfview.go(to: selection)
     }
+       
+    @objc func autoScroll() {
+           // 计算下一步的偏移量
+           let nextPageOffset = CGPoint(x: 0, y: pdfScrollView.contentOffset.y + scrollSpeed)
+           pdfScrollView.setContentOffset(nextPageOffset, animated: false)
+    }
+       // MARK: - UIScrollViewDelegate
+       func scrollViewWillBeginDragging(_ pdfScrollView: UIScrollView) {
+           // 用户开始拖动时停止自动滚动
+           timer?.invalidate()
+           timer = nil
+       }
+       func scrollViewDidEndDragging(_ pdfScrollView: UIScrollView, willDecelerate decelerate: Bool) {
+           // 用户结束拖动时重新启动自动滚动
+           timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
+       }
 }
