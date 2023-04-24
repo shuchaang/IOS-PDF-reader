@@ -11,7 +11,7 @@ import PDFKit
 
 class PDFViewController: UIViewController {
     
-    var pdfPath:String?
+    var pdfPath:URL?
 
     private var rollBtn: UIButton!
     private var backBtn: UIButton!
@@ -26,7 +26,7 @@ class PDFViewController: UIViewController {
     var scrollSpeed: CGFloat = 0.5 // 滚动速率，可根据需要调整
 
     
-     init(param: String) {
+     init(param: URL) {
         self.pdfPath=param
         super.init(nibName: nil, bundle: nil)
     }
@@ -40,8 +40,8 @@ class PDFViewController: UIViewController {
         
         pdfview = PDFView()
         
-        let url = Bundle.main.url(forResource: pdfPath, withExtension: "pdf")
-        pdfdocument = PDFDocument(url: url!)
+       
+        pdfdocument = PDFDocument(url: pdfPath!)
         
         pdfview.document = pdfdocument
         pdfview.displayMode = .singlePageContinuous

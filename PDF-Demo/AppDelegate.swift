@@ -18,6 +18,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         return true
     }
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool{
+        if url.isFileURL && url.pathExtension.lowercased() == "pdf" {
+                    // 处理 PDF 文件
+                    print("接收到 PDF 文件，文件路径：\(url.path)")
+                    // 将 PDF 文件复制到应用内的目标路径
+                    let fileManager = FileManager.default
+                    let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+                    let destinationURL = documentsDirectory.appendingPathComponent(url.lastPathComponent)
+                    
+                    do {
+                        try fileManager.copyItem(at: url, to: destinationURL)
+                        let alertController = UIAlertController(title: "Success", message: "File copied successfully.", preferredStyle: .alert)
+                                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                                    alertController.addAction(okAction)
+                                    window?.rootViewController?.present(alertController, animated: true, completion: nil)
+                        return true
+                    } catch {
+                        let alertController = UIAlertController(title: "failed", message: "复制 PDF 文件到应用内失败：\(error.localizedDescription)", preferredStyle: .alert)
+                                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                                    alertController.addAction(okAction)
+                                    window?.rootViewController?.present(alertController, animated: true, completion: nil)
+                        print("复制 PDF 文件到应用内失败：\(error.localizedDescription)")
+                        return false
+                    }
+                }
+                
+                return false
+    }
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
