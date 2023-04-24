@@ -23,7 +23,7 @@ class PDFViewController: UIViewController {
     private weak var observe : NSObjectProtocol?
     var isRolling = false
     var timer: Timer?
-    var scrollSpeed: CGFloat = 1.0 // 滚动速率，可根据需要调整
+    var scrollSpeed: CGFloat = 0.5 // 滚动速率，可根据需要调整
 
     
      init(param: String) {
@@ -55,15 +55,20 @@ class PDFViewController: UIViewController {
         view.addSubview(pdfview)
         
         rollBtn = UIButton(type: .system)
-        rollBtn.frame = CGRect(x:5, y:100, width:100, height:30)
+        rollBtn.frame = CGRect(x:10, y:100, width:50, height:30)
         rollBtn.setTitle("滚", for:.normal)
+        rollBtn.layer.cornerRadius = 5
+        rollBtn.layer.masksToBounds = true
+        rollBtn.setTitleColor(UIColor.white,for: .normal)
+        rollBtn.backgroundColor = UIColor.purple
         rollBtn.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         rollBtn.addTarget(self, action: #selector(autoRollClick), for: .touchUpInside)
         pdfview.addSubview(rollBtn)
 
         backBtn = UIButton(type: .system)
-        backBtn.frame = CGRect(x:0, y:20, width:100, height:30)
-        backBtn.setTitle("BACK", for:.normal)
+        backBtn.frame = CGRect(x:5, y:5, width:50, height:50)
+        backBtn.setImage(UIImage(named: "arrow_left"), for: .normal)
+        backBtn.setTitle("back",for: .normal)
         backBtn.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         backBtn.addTarget(self, action: #selector(backClick), for: .touchUpInside)
         pdfview.addSubview(backBtn)
@@ -223,9 +228,17 @@ extension PDFViewController: SearchTableViewControllerDelegate {
     }
        
     @objc func autoScroll() {
-           // 计算下一步的偏移量
-           let nextPageOffset = CGPoint(x: 0, y: pdfScrollView.contentOffset.y + scrollSpeed)
-           pdfScrollView.setContentOffset(nextPageOffset, animated: false)
+        // 检查当前滚动位置是否已经滚动到底部
+                let bottomEdge = pdfScrollView.contentOffset.y + pdfScrollView.bounds.size.height
+                if bottomEdge >= pdfScrollView.contentSize.height {
+                    timer?.invalidate()
+                    timer = nil
+                } else {
+                    // 计算下一步的偏移量
+                    let nextPageOffset = CGPoint(x: 0, y: pdfScrollView.contentOffset.y + scrollSpeed)
+                    pdfScrollView.setContentOffset(nextPageOffset, animated: false)
+                }
+          
     }
        // MARK: - UIScrollViewDelegate
        func scrollViewWillBeginDragging(_ pdfScrollView: UIScrollView) {

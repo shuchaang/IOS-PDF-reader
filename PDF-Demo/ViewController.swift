@@ -15,8 +15,6 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         selectPDF = UIButton(type: .system)
         selectPDF.frame = CGRect(x:5, y:100, width:100, height:30)
         selectPDF.setTitle("sample.pdf", for:.normal)
@@ -27,7 +25,7 @@ class ViewController: UIViewController {
     
     @objc func readPDF(sender: UIButton) {
         let separatedStrings = sender.currentTitle!.components(separatedBy: ".")
-        if separatedStrings.count == 2 {
+        if separatedStrings.count == 2 && separatedStrings[1]=="pdf"{
             let name = separatedStrings[0]
             self.present(PDFViewController(param: name),animated: true,completion: nil)
         } else {
