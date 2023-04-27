@@ -8,83 +8,96 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController{
     
     private var selectPDF: UIButton!
-    private var scrollView: UIScrollView!
+    private var tableView: UITableView!
     var pdfFiles: [URL] = [] // 存储所有 PDF 文件 URL 的数组
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // 创建 UIScrollView
-                scrollView = UIScrollView()
-                scrollView.translatesAutoresizingMaskIntoConstraints = false
-                view.addSubview(scrollView)
-                
-            // 获取 Documents 目录的 URL
-                let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-
-                do {
-                    // 获取 Documents 目录下的所有文件 URL
-                    let fileURLs = try FileManager.default.contentsOfDirectory(at: documentsDirectory, includingPropertiesForKeys: nil, options: [.skipsSubdirectoryDescendants, .skipsHiddenFiles])
-
-                    // 筛选出扩展名为 "pdf" 的文件 URL
-                    pdfFiles = fileURLs.filter { $0.pathExtension.lowercased() == "pdf" }
-                } catch {
-                    let alertController = UIAlertController(title: "failed", message: "Error getting PDF files: \(error.localizedDescription)", preferredStyle: .alert)
-                                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                                alertController.addAction(okAction)
-                                self.present(alertController, animated: true, completion: nil)
-                }
-
-                setupUI()
-        
+        // 设置背景颜色
+        tableView = UITableView(frame: view.bounds, style: .plain)
+        view.backgroundColor = .white
+        self.tableView.dataSource = self
+        self.tableView.delegate = self
+        // 创建目录视图
+        view.addSubview(tableView)
+        self.pdfFiles = self.loadData()
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
     }
-    func setupUI() {
-            // 在视图上创建按钮，并为每个文件创建一个按钮
-            for fileURL in pdfFiles {
-                let button = UIButton(type: .system)
-                button.setTitle(fileURL.lastPathComponent, for: .normal)
-                button.setTitleColor(.blue, for: .normal)
-                button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
-                view.addSubview(button)
-
-                // 设置按钮约束
-                button.translatesAutoresizingMaskIntoConstraints = false
-                button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-                button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
-                button.heightAnchor.constraint(equalToConstant: 40).isActive = true
-
-                if let lastButton = view.subviews[view.subviews.count - 2] as? UIButton {
-                    button.topAnchor.constraint(equalTo: lastButton.bottomAnchor, constant: 10).isActive = true
-                } else {
-                    button.topAnchor.constraint(equalTo: view.topAnchor, constant: 20).isActive = true
-                }
-            }
-        }
-
-        @objc func buttonTapped(_ sender: UIButton) {
-            guard let title = sender.titleLabel?.text else {
-                return
-            }
-
-            // 在按钮点击时处理文件的打开操作
-            if let fileURL = pdfFiles.first(where: { $0.lastPathComponent == title }) {
-                openPDF(fileURL: fileURL)
-            }
-        }
-
-        func openPDF(fileURL: URL) {
-            // 在此处处理打开 PDF 文件的逻辑，例如通过 UIDocumentInteractionController 进行文件的预览和打开操作
-            let separatedStrings = fileURL.path.components(separatedBy: ".")
-            if separatedStrings.count == 2 && separatedStrings[1]=="pdf"{
-                self.present(PDFViewController(param: fileURL),animated: true,completion: nil)
-            } else {
-                let alertController = UIAlertController(title: "failed", message: "打开文件失败", preferredStyle: .alert)
-                            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                            alertController.addAction(okAction)
-                            self.present(alertController, animated: true, completion: nil)
-            }
-        }
     
+    @objc func refreshData(){
+        // 模拟异步加载数据
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    // 更新数据源
+                    self.pdfFiles = self.loadData()
+                    // 刷新表格视图
+                    self.tableView.reloadData()
+                    // 结束刷新
+                    self.tableView.refreshControl?.endRefreshing()
+                }
+    }
+    func loadData()->[URL]{
+        // 获取 Documents 目录的 URL
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
+        do {
+            // 获取 Documents 目录下的所有文件 URL
+            let fileURLs = try FileManager.default.contentsOfDirectory(at: documentsDirectory, includingPropertiesForKeys: nil, options: [.skipsSubdirectoryDescendants, .skipsHiddenFiles])
+            
+            // 筛选出扩展名为 "pdf" 的文件 URL
+            pdfFiles = fileURLs.filter { $0.pathExtension.lowercased() == "pdf" }
+            return pdfFiles
+        } catch {
+            let alertController = UIAlertController(title: "failed", message: "Error getting PDF files: \(error.localizedDescription)", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alertController.addAction(okAction)
+            self.present(alertController, animated: true, completion: nil)
+        }
+        return []
+    }
+    
+    func openPDF(fileURL: URL) {
+        // 在此处处理打开 PDF 文件的逻辑，例如通过 UIDocumentInteractionController 进行文件的预览和打开操作
+        let separatedStrings = fileURL.path.components(separatedBy: ".")
+        if separatedStrings.count == 2 && separatedStrings[1]=="pdf"{
+            self.present(PDFViewController(param: fileURL),animated: true,completion: nil)
+        } else {
+            let alertController = UIAlertController(title: "failed", message: "打开文件失败", preferredStyle: .alert)
+                        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                        alertController.addAction(okAction)
+                        self.present(alertController, animated: true, completion: nil)
+        }
+    }
 }
+   
+
+extension ViewController: UITableViewDataSource {
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return pdfFiles.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
+        let url = pdfFiles[indexPath.row]
+        cell.textLabel?.text = url.lastPathComponent
+        return cell
+    }
+}
+
+extension ViewController: UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        // 处理点击事件，例如打开文件
+        let url = pdfFiles[indexPath.row]
+        openPDF(fileURL: url)
+    }
+}
+    
+

@@ -55,7 +55,7 @@ class PDFViewController: UIViewController {
         view.addSubview(pdfview)
         
         rollBtn = UIButton(type: .system)
-        rollBtn.frame = CGRect(x:10, y:100, width:50, height:30)
+        rollBtn.frame = CGRect(x:10, y:100, width:50, height:50)
         rollBtn.setTitle("滚", for:.normal)
         rollBtn.layer.cornerRadius = 5
         rollBtn.layer.masksToBounds = true
@@ -194,7 +194,7 @@ class PDFViewController: UIViewController {
         }else{
             // 启动定时器，实现自动滚动
             rollBtn.setTitle("停",for:.normal)
-            timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
             isRolling=true
         }
     }
@@ -248,6 +248,6 @@ extension PDFViewController: SearchTableViewControllerDelegate {
        }
        func scrollViewDidEndDragging(_ pdfScrollView: UIScrollView, willDecelerate decelerate: Bool) {
            // 用户结束拖动时重新启动自动滚动
-           timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
+           timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
        }
 }
