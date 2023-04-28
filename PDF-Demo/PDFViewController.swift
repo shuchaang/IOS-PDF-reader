@@ -18,13 +18,16 @@ class PDFViewController: UIViewController {
     private var pdfdocument: PDFDocument?
     private var pdfview: PDFView!
     private var pdfScrollView: UIScrollView!
-    private var pdfThumbView: PDFThumbnailView!
+    private var speedSlider: UISlider!
+    private var sppedLabel: UILabel!
     private lazy var toolView = ToolView.instanceFromNib()
     private weak var observe : NSObjectProtocol?
     var isRolling = false
+    var isSliderHidden = true
     var timer: Timer?
-    var scrollSpeed: CGFloat = 0.5 // 滚动速率，可根据需要调整
-
+    var scrollSpeed: CGFloat = 0.5
+    var timeInterval = 0.05
+    
     
      init(param: URL) {
         self.pdfPath=param
@@ -39,10 +42,7 @@ class PDFViewController: UIViewController {
         super.viewDidLoad()
         
         pdfview = PDFView()
-        
-       
         pdfdocument = PDFDocument(url: pdfPath!)
-        
         pdfview.document = pdfdocument
         pdfview.displayMode = .singlePageContinuous
         pdfview.autoScales = true
@@ -53,6 +53,21 @@ class PDFViewController: UIViewController {
                        }
         }
         view.addSubview(pdfview)
+        speedSlider = UISlider(frame: CGRect(x: 0, y: 0, width: 200, height: 20))
+        speedSlider.minimumValue = 1
+        speedSlider.maximumValue = 20
+        speedSlider.value = 1
+        speedSlider.isHidden=isSliderHidden
+        speedSlider.isContinuous = false
+        speedSlider.transform = CGAffineTransform(rotationAngle: -CGFloat.pi / 2)
+        speedSlider.addTarget(self, action: #selector(sliderTouchUpInside(_:)), for: .touchUpInside)
+
+        sppedLabel = UILabel(frame: CGRect(x: 50, y: 170, width: 200, height: 30))
+        sppedLabel.textAlignment = .center
+        sppedLabel.font = UIFont.systemFont(ofSize: 18)
+        sppedLabel.text = String(format: "当期滚动速度: 1.0")
+        self.view.addSubview(sppedLabel)
+        pdfview.addSubview(speedSlider)
         
         rollBtn = UIButton(type: .system)
         rollBtn.frame = CGRect(x:10, y:100, width:50, height:50)
@@ -73,37 +88,27 @@ class PDFViewController: UIViewController {
         backBtn.addTarget(self, action: #selector(backClick), for: .touchUpInside)
         pdfview.addSubview(backBtn)
 
-        
-        pdfThumbView = PDFThumbnailView()
-        pdfThumbView.layoutMode = .horizontal
-        pdfThumbView.pdfView = pdfview
-        pdfThumbView.backgroundColor = UIColor.red
-        view.addSubview(pdfThumbView)
-        
+    
         view.addSubview(toolView)
         toolView.bringSubviewToFront(view)
         
         toolView.thumbBtn.addTarget(self, action: #selector(thumbBtnClick), for: .touchUpInside)
-        toolView.outlineBtn.addTarget(self, action: #selector(outlineBtnClick), for: .touchUpInside)
-        toolView.searchBtn.addTarget(self, action: #selector(searchBtnClick), for: .touchUpInside)
+        //toolView.outlineBtn.addTarget(self, action: #selector(outlineBtnClick), for: .touchUpInside)
+        //toolView.searchBtn.addTarget(self, action: #selector(searchBtnClick), for: .touchUpInside)
         toolView.editBtn.addTarget(self, action: #selector(setRollSpeedClick), for: .touchUpInside)
        
-        pdfThumbView.translatesAutoresizingMaskIntoConstraints = false
-        pdfThumbView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        pdfThumbView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        pdfThumbView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        pdfThumbView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
         toolView.translatesAutoresizingMaskIntoConstraints = false
         toolView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         toolView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         toolView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         toolView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
+        speedSlider.center = CGPoint(x: self.view.bounds.width - speedSlider.bounds.width / 2 - 20, y: self.view.bounds.height / 2)
+        
         pdfview.translatesAutoresizingMaskIntoConstraints = false
         pdfview.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         pdfview.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        pdfview.topAnchor.constraint(equalTo: pdfThumbView.bottomAnchor, constant: 0).isActive = true
+        pdfview.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         pdfview.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
         let tapgesture = UITapGestureRecognizer(target: self, action: #selector(tapGesture(_:)))
@@ -115,6 +120,14 @@ class PDFViewController: UIViewController {
             self.toolView.alpha = 1 - self.toolView.alpha
         }
     }
+    @objc func sliderTouchUpInside(_ sender: UISlider) {
+        let roundedValue = round(sender.value)
+        sender.value = roundedValue
+        sppedLabel.text = String(format: "当期滚动速度:" + String(roundedValue))
+        let c = CGFloat(roundedValue/2)
+        self.scrollSpeed = c
+    }
+ 
     
     @objc func thumbBtnClick(sender: UIButton!) {
         let layout = UICollectionViewFlowLayout()
@@ -157,25 +170,13 @@ class PDFViewController: UIViewController {
     }
     
     @objc func setRollSpeedClick(sender: UIButton) {
-        // 创建一个提示框
-               let alertController = UIAlertController(title: "设置滚动速度", message: nil, preferredStyle: .alert)
-               // 添加一个文本框到提示框
-               alertController.addTextField { textField in
-                   textField.keyboardType = .numberPad // 设置键盘类型为数字键盘
-               }
-               // 添加一个取消按钮
-               alertController.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
-               // 添加一个确定按钮
-               alertController.addAction(UIAlertAction(title: "确定", style: .default, handler: { [weak self] _ in
-                   // 获取用户输入的数字
-                   if let text = alertController.textFields?.first?.text, let number = Float(text) {
-                       self?.scrollSpeed=CGFloat(number)
-                   } else {
-                       print("输入无效的数字")
-                   }
-               }))
-               // 显示提示框
-               present(alertController, animated: true, completion: nil)
+        if isSliderHidden {
+            isSliderHidden=false
+            speedSlider.isHidden=isSliderHidden
+        }else{
+            isSliderHidden=true
+            speedSlider.isHidden=isSliderHidden
+        }
     }
 
     
@@ -194,7 +195,7 @@ class PDFViewController: UIViewController {
         }else{
             // 启动定时器，实现自动滚动
             rollBtn.setTitle("停",for:.normal)
-            timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
+            timer = newTimer()
             isRolling=true
         }
     }
@@ -248,6 +249,10 @@ extension PDFViewController: SearchTableViewControllerDelegate {
        }
        func scrollViewDidEndDragging(_ pdfScrollView: UIScrollView, willDecelerate decelerate: Bool) {
            // 用户结束拖动时重新启动自动滚动
-           timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
+           timer =  newTimer()
        }
+    
+    func newTimer() -> Timer {
+        return Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(autoScroll), userInfo: nil, repeats: true)
+    }
 }
