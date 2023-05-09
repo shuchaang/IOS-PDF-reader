@@ -26,6 +26,7 @@
 		3FFD89EF1F02586C00966CCF /* OulineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FFD89ED1F02586C00966CCF /* OulineTableViewCell.swift */; };
 		3FFD89F01F02586C00966CCF /* OulineTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FFD89EE1F02586C00966CCF /* OulineTableViewCell.xib */; };
 		41C8701529F515EF00618B2C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C8701429F515EF00618B2C /* ViewController.swift */; };
+		41CE71762A08F5D800A5921C /* MySlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CE71752A08F5D800A5921C /* MySlider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		3FFD89ED1F02586C00966CCF /* OulineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OulineTableViewCell.swift; sourceTree = "<group>"; };
 		3FFD89EE1F02586C00966CCF /* OulineTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OulineTableViewCell.xib; sourceTree = "<group>"; };
 		41C8701429F515EF00618B2C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		41CE71752A08F5D800A5921C /* MySlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySlider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 				3FEBE3101F01E84F00DE2722 /* Info.plist */,
 				3FF14BFA24AB2CCE001209ED /* sample.pdf */,
 				41C8701429F515EF00618B2C /* ViewController.swift */,
+				41CE71752A08F5D800A5921C /* MySlider.swift */,
 			);
 			path = "PDF-Demo";
 			sourceTree = "<group>";
@@ -184,6 +187,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41CE71762A08F5D800A5921C /* MySlider.swift in Sources */,
 				41C8701529F515EF00618B2C /* ViewController.swift in Sources */,
 				3FEBE3201F0206C600DE2722 /* ToolView.swift in Sources */,
 				3F77F44C1F023BB4000732A9 /* OulineTableviewController.swift in Sources */,

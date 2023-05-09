@@ -33,7 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                                     alertController.addAction(okAction)
                                     window?.rootViewController?.present(alertController, animated: true, completion: nil)
-                        return true
                     } catch {
                         let alertController = UIAlertController(title: "failed", message: "复制 PDF 文件到应用内失败：\(error.localizedDescription)", preferredStyle: .alert)
                                     let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)

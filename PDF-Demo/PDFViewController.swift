@@ -18,10 +18,11 @@ class PDFViewController: UIViewController {
     private var pdfdocument: PDFDocument?
     private var pdfview: PDFView!
     private var pdfScrollView: UIScrollView!
-    private var speedSlider: UISlider!
+    private var stepper: UIStepper!
     private var sppedLabel: UILabel!
     private lazy var toolView = ToolView.instanceFromNib()
     private weak var observe : NSObjectProtocol?
+
     var isRolling = false
     var isSliderHidden = true
     var timer: Timer?
@@ -53,21 +54,31 @@ class PDFViewController: UIViewController {
                        }
         }
         view.addSubview(pdfview)
-        speedSlider = UISlider(frame: CGRect(x: 0, y: 0, width: 200, height: 20))
-        speedSlider.minimumValue = 1
-        speedSlider.maximumValue = 20
-        speedSlider.value = 1
-        speedSlider.isHidden=isSliderHidden
-        speedSlider.isContinuous = false
-        speedSlider.transform = CGAffineTransform(rotationAngle: -CGFloat.pi / 2)
-        speedSlider.addTarget(self, action: #selector(sliderTouchUpInside(_:)), for: .touchUpInside)
-
-        sppedLabel = UILabel(frame: CGRect(x: 50, y: 170, width: 200, height: 30))
+        stepper = UIStepper()
+        stepper.frame = CGRect(x: 0, y: 0, width: 100, height: 50)
+        stepper.minimumValue=1
+        stepper.maximumValue=10
+        stepper.value=1
+        stepper.stepValue=1
+        stepper.isContinuous=true
+        stepper.wraps=true
+        pdfview.addSubview(stepper)
+        stepper.translatesAutoresizingMaskIntoConstraints = false
+        stepper.trailingAnchor.constraint(equalTo: pdfview.trailingAnchor, constant: -20).isActive = true
+        stepper.bottomAnchor.constraint(equalTo: pdfview.bottomAnchor, constant: -70).isActive = true
+        stepper.addTarget(self, action: #selector(stepperValueChanged(_:)), for: .valueChanged)
+       
+        
+        sppedLabel = UILabel(frame: CGRect(x: 0, y:0, width: 200, height: 50))
         sppedLabel.textAlignment = .center
         sppedLabel.font = UIFont.systemFont(ofSize: 18)
-        sppedLabel.text = String(format: "当期滚动速度: 1.0")
-        self.view.addSubview(sppedLabel)
-        pdfview.addSubview(speedSlider)
+        sppedLabel.text = String(format: "滚动速度:")
+        pdfview.addSubview(sppedLabel)
+        sppedLabel.translatesAutoresizingMaskIntoConstraints = false
+        sppedLabel.trailingAnchor.constraint(equalTo: pdfview.trailingAnchor, constant: -20).isActive = true
+        sppedLabel.bottomAnchor.constraint(equalTo: pdfview.bottomAnchor, constant: -120).isActive = true
+        
+        
         
         rollBtn = UIButton(type: .system)
         rollBtn.frame = CGRect(x:10, y:100, width:50, height:50)
@@ -87,30 +98,25 @@ class PDFViewController: UIViewController {
         backBtn.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         backBtn.addTarget(self, action: #selector(backClick), for: .touchUpInside)
         pdfview.addSubview(backBtn)
-
-    
+        
         view.addSubview(toolView)
         toolView.bringSubviewToFront(view)
-        
         toolView.thumbBtn.addTarget(self, action: #selector(thumbBtnClick), for: .touchUpInside)
-        //toolView.outlineBtn.addTarget(self, action: #selector(outlineBtnClick), for: .touchUpInside)
-        //toolView.searchBtn.addTarget(self, action: #selector(searchBtnClick), for: .touchUpInside)
         toolView.editBtn.addTarget(self, action: #selector(setRollSpeedClick), for: .touchUpInside)
-       
         toolView.translatesAutoresizingMaskIntoConstraints = false
         toolView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         toolView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         toolView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         toolView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        speedSlider.center = CGPoint(x: self.view.bounds.width - speedSlider.bounds.width / 2 - 20, y: self.view.bounds.height / 2)
         
         pdfview.translatesAutoresizingMaskIntoConstraints = false
         pdfview.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         pdfview.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         pdfview.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         pdfview.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        
+    
+                
         let tapgesture = UITapGestureRecognizer(target: self, action: #selector(tapGesture(_:)))
         view.addGestureRecognizer(tapgesture)
     }
@@ -120,10 +126,9 @@ class PDFViewController: UIViewController {
             self.toolView.alpha = 1 - self.toolView.alpha
         }
     }
-    @objc func sliderTouchUpInside(_ sender: UISlider) {
+    @objc func stepperValueChanged(_ sender: UIStepper) {
         let roundedValue = round(sender.value)
-        sender.value = roundedValue
-        sppedLabel.text = String(format: "当期滚动速度:" + String(roundedValue))
+        sppedLabel.text = String(format: "滚动速度:" + sender.value.description)
         let c = CGFloat(roundedValue/2)
         self.scrollSpeed = c
     }
@@ -172,10 +177,10 @@ class PDFViewController: UIViewController {
     @objc func setRollSpeedClick(sender: UIButton) {
         if isSliderHidden {
             isSliderHidden=false
-            speedSlider.isHidden=isSliderHidden
+            stepper.isHidden=isSliderHidden
         }else{
             isSliderHidden=true
-            speedSlider.isHidden=isSliderHidden
+            stepper.isHidden=isSliderHidden
         }
     }
 
