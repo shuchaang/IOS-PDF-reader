@@ -12,7 +12,8 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    private var db = UserDefaults.standard
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -26,13 +27,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let fileManager = FileManager.default
                     let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
                     let destinationURL = documentsDirectory.appendingPathComponent(url.lastPathComponent)
-                    
                     do {
                         try fileManager.copyItem(at: url, to: destinationURL)
+                        db.set(1, forKey: destinationURL.absoluteString)
+                        if let v = self.window?.rootViewController as? ViewController {
+                            v.refreshData()
+                        }
                         let alertController = UIAlertController(title: "Success", message: "File copied successfully.", preferredStyle: .alert)
-                                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                                    alertController.addAction(okAction)
-                                    window?.rootViewController?.present(alertController, animated: true, completion: nil)
+                        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                        alertController.addAction(okAction)
+                        window?.rootViewController?.present(alertController, animated: true, completion: nil)
                     } catch {
                         let alertController = UIAlertController(title: "failed", message: "复制 PDF 文件到应用内失败：\(error.localizedDescription)", preferredStyle: .alert)
                                     let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -42,10 +46,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         return false
                     }
                 }
-                
                 return false
     }
-
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.

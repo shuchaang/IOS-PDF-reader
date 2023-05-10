@@ -13,11 +13,13 @@ class ViewController: UIViewController{
     private var selectPDF: UIButton!
     private var tableView: UITableView!
     var pdfFiles: [URL] = [] // 存储所有 PDF 文件 URL 的数组
-    
+    private var db:UserDefaults!
+    private var fileManage =  FileManager.default
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // 设置背景颜色
+        db = UserDefaults.standard
         tableView = UITableView(frame: view.bounds, style: .plain)
         view.backgroundColor = .white
         self.tableView.dataSource = self
@@ -43,11 +45,11 @@ class ViewController: UIViewController{
     }
     func loadData()->[URL]{
         // 获取 Documents 目录的 URL
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsDirectory = fileManage.urls(for: .documentDirectory, in: .userDomainMask).first!
         
         do {
             // 获取 Documents 目录下的所有文件 URL
-            let fileURLs = try FileManager.default.contentsOfDirectory(at: documentsDirectory, includingPropertiesForKeys: nil, options: [.skipsSubdirectoryDescendants, .skipsHiddenFiles])
+            let fileURLs = try fileManage.contentsOfDirectory(at: documentsDirectory, includingPropertiesForKeys: nil, options: [.skipsSubdirectoryDescendants, .skipsHiddenFiles])
             
             // 筛选出扩展名为 "pdf" 的文件 URL
             pdfFiles = fileURLs.filter { $0.pathExtension.lowercased() == "pdf" }
@@ -65,7 +67,8 @@ class ViewController: UIViewController{
         // 在此处处理打开 PDF 文件的逻辑，例如通过 UIDocumentInteractionController 进行文件的预览和打开操作
         let separatedStrings = fileURL.path.components(separatedBy: ".")
         if separatedStrings.count == 2 && separatedStrings[1]=="pdf"{
-            let pdfvc = PDFViewController(param: fileURL)
+            let speed = CGFloat(db.object(forKey: fileURL.absoluteString) as? Int ?? 1)
+            let pdfvc = PDFViewController(param: fileURL,speed: CGFloat(speed)/2)
             pdfvc.modalPresentationStyle = .fullScreen
             self.present(pdfvc,animated: true,completion: nil)
         } else {
@@ -108,17 +111,22 @@ extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let url = pdfFiles[indexPath.row]
-            if FileManager.default.fileExists(atPath: url.path){
+            if fileManage.fileExists(atPath: url.path){
                 do{
-                    try FileManager.default.removeItem(at: url)
+                    try fileManage.removeItem(at: url)
+                    db.removeObject(forKey: url.absoluteString)
+                    refreshData()
+                    let alertController = UIAlertController(title: "Success", message: "File delete successfully.", preferredStyle: .alert)
+                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                    alertController.addAction(okAction)
+                    self.present(alertController, animated: true, completion: nil)
                 }catch{
                     let alertController = UIAlertController(title: "Failed", message: "delete file failed", preferredStyle: .alert)
-                                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                                alertController.addAction(okAction)
-                                self.present(alertController, animated: true, completion: nil)
+                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                    alertController.addAction(okAction)
+                    self.present(alertController, animated: true, completion: nil)
                 }
             }
-            refreshData()
         }
     }
 }

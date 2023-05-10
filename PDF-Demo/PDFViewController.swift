@@ -11,7 +11,7 @@ import PDFKit
 
 class PDFViewController: UIViewController {
     
-    var pdfPath:URL?
+    var pdfPath:URL!
 
     private var rollBtn: UIButton!
     private var backBtn: UIButton!
@@ -26,12 +26,15 @@ class PDFViewController: UIViewController {
     var isRolling = false
     var isSliderHidden = true
     var timer: Timer?
-    var scrollSpeed: CGFloat = 0.5
+    var scrollSpeed: CGFloat = 0
+    var speedShowMul:CGFloat = 2
     var timeInterval = 0.05
+    private var db:UserDefaults!
     
-    
-     init(param: URL) {
+    init(param: URL,speed:CGFloat) {
         self.pdfPath=param
+        self.scrollSpeed = speed
+        self.db = UserDefaults.standard
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -58,7 +61,7 @@ class PDFViewController: UIViewController {
         stepper.frame = CGRect(x: 0, y: 0, width: 100, height: 50)
         stepper.minimumValue=1
         stepper.maximumValue=10
-        stepper.value=1
+        stepper.value=scrollSpeed*speedShowMul
         stepper.stepValue=1
         stepper.isContinuous=true
         stepper.wraps=true
@@ -67,18 +70,15 @@ class PDFViewController: UIViewController {
         stepper.trailingAnchor.constraint(equalTo: pdfview.trailingAnchor, constant: -20).isActive = true
         stepper.bottomAnchor.constraint(equalTo: pdfview.bottomAnchor, constant: -70).isActive = true
         stepper.addTarget(self, action: #selector(stepperValueChanged(_:)), for: .valueChanged)
-       
-        
         sppedLabel = UILabel(frame: CGRect(x: 0, y:0, width: 200, height: 50))
         sppedLabel.textAlignment = .center
         sppedLabel.font = UIFont.systemFont(ofSize: 18)
-        sppedLabel.text = String(format: "滚动速度:")
+        sppedLabel.text = String(format: "滚动速度:\(scrollSpeed*speedShowMul)")
         pdfview.addSubview(sppedLabel)
         sppedLabel.translatesAutoresizingMaskIntoConstraints = false
         sppedLabel.trailingAnchor.constraint(equalTo: pdfview.trailingAnchor, constant: -20).isActive = true
         sppedLabel.bottomAnchor.constraint(equalTo: pdfview.bottomAnchor, constant: -120).isActive = true
-        
-        
+     
         
         rollBtn = UIButton(type: .system)
         rollBtn.frame = CGRect(x:10, y:100, width:50, height:50)
@@ -128,8 +128,9 @@ class PDFViewController: UIViewController {
     }
     @objc func stepperValueChanged(_ sender: UIStepper) {
         let roundedValue = round(sender.value)
+        db.set(roundedValue, forKey: pdfPath.absoluteString)
         sppedLabel.text = String(format: "滚动速度:" + sender.value.description)
-        let c = CGFloat(roundedValue/2)
+        let c = CGFloat(roundedValue)/speedShowMul
         self.scrollSpeed = c
     }
  
